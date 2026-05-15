@@ -1,0 +1,26 @@
+[project]
+name = "notion-kanban-mcp"
+version = "0.1.0"
+description = "A FastMCP server for Notion kanban board integration"
+requires-python = ">=3.11"
+dependencies = [
+    "mcp[cli]",
+    "notion-client",
+    "pydantic",
+    "python-dotenv",
+    "uvicorn",
+]
+
+[project.optional-dependencies]
+client = [
+    "boto3",
+    "gradio",
+    "mcp[cli]",
+]
+
+[project.scripts]
+notion-kanban-mcp = "src.server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
