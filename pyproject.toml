@@ -11,12 +11,6 @@ dependencies = [
     "uvicorn",
 ]
 
-[project.optional-dependencies]
-client = [
-    "boto3",
-    "gradio",
-    "mcp[cli]",
-]
 
 [project.scripts]
 notion-kanban-mcp = "src.server:main"

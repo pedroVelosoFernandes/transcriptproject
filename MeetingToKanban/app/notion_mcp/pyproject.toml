@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "notion_mcp"
+version = "0.1.0"
+description = "AgentCore MCP Server"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp[cli]",
+    "notion-client",
+    "pydantic",
+    "python-dotenv",
+    "uvicorn",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
