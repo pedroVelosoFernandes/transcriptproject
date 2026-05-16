@@ -218,3 +218,5 @@ __marimo__/
 .streamlit/secrets.toml
 .claude
 uv.lock
+mcp_notion_kanban
+teste/
