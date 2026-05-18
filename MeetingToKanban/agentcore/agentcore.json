@@ -19,12 +19,36 @@
         "enableOtel": false
       },
       "protocol": "MCP"
+    },
+    {
+      "name": "MeetingToKanban_agent",
+      "build": "CodeZip",
+      "entrypoint": "main.py",
+      "codeLocation": "app/MeetingToKanban_agent/",
+      "runtimeVersion": "PYTHON_3_14",
+      "networkMode": "PUBLIC",
+      "protocol": "HTTP"
     }
   ],
-  "memories": [],
+  "memories": [
+    {
+      "name": "MeetingToKanban_agentMemory",
+      "eventExpiryDuration": 30,
+      "strategies": []
+    }
+  ],
   "credentials": [],
   "evaluators": [],
   "onlineEvalConfigs": [],
-  "agentCoreGateways": [],
+  "agentCoreGateways": [
+    {
+      "name": "MeetingToKanbanGTW",
+      "description": "Gateway for MeetingToKanbanGTW",
+      "targets": [],
+      "authorizerType": "AWS_IAM",
+      "enableSemanticSearch": true,
+      "exceptionLevel": "NONE"
+    }
+  ],
   "policyEngines": []
 }

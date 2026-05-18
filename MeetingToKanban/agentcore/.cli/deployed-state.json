@@ -4,9 +4,29 @@
       "resources": {
         "runtimes": {
           "notion_mcp": {
-            "runtimeId": "MeetingToKanban_notion_mcp-zx30bZ376V",
-            "runtimeArn": "arn:aws:bedrock-agentcore:us-east-1:631510543425:runtime/MeetingToKanban_notion_mcp-zx30bZ376V",
-            "roleArn": "arn:aws:iam::631510543425:role/AgentCore-MeetingToKanban-ApplicationAgentNotionMcp-XsDOJVYqQtUU"
+            "runtimeId": "MeetingToKanban_notion_mcp-tVkG1I4KZ3",
+            "runtimeArn": "arn:aws:bedrock-agentcore:us-east-1:631510543425:runtime/MeetingToKanban_notion_mcp-tVkG1I4KZ3",
+            "roleArn": "arn:aws:iam::631510543425:role/AgentCore-MeetingToKanban-ApplicationAgentNotionMcp-5RqMNl56Fidc"
+          },
+          "MeetingToKanban_agent": {
+            "runtimeId": "MeetingToKanban_MeetingToKanban_agent-lIqWSk4PVI",
+            "runtimeArn": "arn:aws:bedrock-agentcore:us-east-1:631510543425:runtime/MeetingToKanban_MeetingToKanban_agent-lIqWSk4PVI",
+            "roleArn": "arn:aws:iam::631510543425:role/AgentCore-MeetingToKanban-ApplicationAgentMeetingTo-bdf37DK6KrNn"
+          }
+        },
+        "memories": {
+          "MeetingToKanban_agentMemory": {
+            "memoryId": "MeetingToKanban_MeetingToKanban_agentMemory-RVeJq74zYU",
+            "memoryArn": "arn:aws:bedrock-agentcore:us-east-1:631510543425:memory/MeetingToKanban_MeetingToKanban_agentMemory-RVeJq74zYU"
+          }
+        },
+        "mcp": {
+          "gateways": {
+            "MeetingToKanbanGTW": {
+              "gatewayId": "meetingtokanban-meetingtokanbangtw-0ch1wpndak",
+              "gatewayArn": "arn:aws:bedrock-agentcore:us-east-1:631510543425:gateway/meetingtokanban-meetingtokanbangtw-0ch1wpndak",
+              "gatewayUrl": "https://meetingtokanban-meetingtokanbangtw-0ch1wpndak.gateway.bedrock-agentcore.us-east-1.amazonaws.com/mcp"
+            }
           }
         },
         "stackName": "AgentCore-MeetingToKanban-default"
