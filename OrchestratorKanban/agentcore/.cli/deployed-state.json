@@ -1,0 +1,43 @@
+{
+  "targets": {
+    "default": {
+      "resources": {
+        "runtimes": {
+          "agent_orchestrator": {
+            "runtimeId": "OrchestratorKanban_agent_orchestrator-OWy5Jx7DqB",
+            "runtimeArn": "arn:aws:bedrock-agentcore:us-east-1:631510543425:runtime/OrchestratorKanban_agent_orchestrator-OWy5Jx7DqB",
+            "roleArn": "arn:aws:iam::631510543425:role/AgentCore-OrchestratorKan-ApplicationAgentAgentOrch-JFDBbQf7aqh6"
+          }
+        },
+        "memories": {
+          "agent_orchestratorMemory": {
+            "memoryId": "OrchestratorKanban_agent_orchestratorMemory-wuGgvYFve9",
+            "memoryArn": "arn:aws:bedrock-agentcore:us-east-1:631510543425:memory/OrchestratorKanban_agent_orchestratorMemory-wuGgvYFve9"
+          }
+        },
+        "mcp": {
+          "gateways": {
+            "GatewayKanban": {
+              "gatewayId": "orchestratorkanban-gatewaykanban-bip5dkxfq9",
+              "gatewayArn": "arn:aws:bedrock-agentcore:us-east-1:631510543425:gateway/orchestratorkanban-gatewaykanban-bip5dkxfq9",
+              "gatewayUrl": "https://orchestratorkanban-gatewaykanban-bip5dkxfq9.gateway.bedrock-agentcore.us-east-1.amazonaws.com/mcp"
+            }
+          }
+        },
+        "credentials": {
+          "agent_orchestrator-oauth": {
+            "credentialProviderArn": "arn:aws:bedrock-agentcore:us-east-1:631510543425:token-vault/default/oauth2credentialprovider/agent_orchestrator-oauth",
+            "clientSecretArn": "arn:aws:secretsmanager:us-east-1:631510543425:secret:bedrock-agentcore-identity!default/oauth2/agent_orchestrator-oauth-834d0bee-0zknVK",
+            "callbackUrl": "https://bedrock-agentcore.us-east-1.amazonaws.com/identities/oauth2/callback/c39d420c-0184-46ea-a56b-9066582d2782"
+          },
+          "GatewayKanban-oauth": {
+            "credentialProviderArn": "arn:aws:bedrock-agentcore:us-east-1:631510543425:token-vault/default/oauth2credentialprovider/GatewayKanban-oauth",
+            "clientSecretArn": "arn:aws:secretsmanager:us-east-1:631510543425:secret:bedrock-agentcore-identity!default/oauth2/GatewayKanban-oauth-c61a47a2-ToWWgf",
+            "callbackUrl": "https://bedrock-agentcore.us-east-1.amazonaws.com/identities/oauth2/callback/29ff18fb-de5a-42f0-889f-350f8542cae6"
+          }
+        },
+        "stackName": "AgentCore-OrchestratorKanban-default"
+      }
+    }
+  }
+}

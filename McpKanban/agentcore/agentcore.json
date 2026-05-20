@@ -1,0 +1,48 @@
+{
+  "$schema": "https://schema.agentcore.aws.dev/v1/agentcore.json",
+  "name": "McpKanban",
+  "version": 1,
+  "managedBy": "CDK",
+  "tags": {
+    "agentcore:created-by": "agentcore-cli",
+    "agentcore:project-name": "McpKanban"
+  },
+  "runtimes": [
+    {
+      "name": "mcp_notion",
+      "build": "CodeZip",
+      "entrypoint": "main.py",
+      "codeLocation": "app/mcp_notion/",
+      "runtimeVersion": "PYTHON_3_14",
+      "networkMode": "PUBLIC",
+      "instrumentation": {
+        "enableOtel": false
+      },
+      "protocol": "MCP",
+      "authorizerType": "CUSTOM_JWT",
+      "authorizerConfiguration": {
+        "customJwtAuthorizer": {
+          "discoveryUrl": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_YcWqwsxwB/.well-known/openid-configuration",
+          "allowedClients": [
+            "42lqalo5vsb6ofoboq0dgvfb4i"
+          ]
+        }
+      }
+    }
+  ],
+  "memories": [],
+  "credentials": [
+    {
+      "authorizerType": "OAuthCredentialProvider",
+      "name": "mcp_notion-oauth",
+      "discoveryUrl": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_YcWqwsxwB/.well-known/openid-configuration",
+      "vendor": "CustomOauth2",
+      "managed": true,
+      "usage": "inbound"
+    }
+  ],
+  "evaluators": [],
+  "onlineEvalConfigs": [],
+  "agentCoreGateways": [],
+  "policyEngines": []
+}

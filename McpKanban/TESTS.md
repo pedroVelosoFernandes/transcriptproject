@@ -7,7 +7,7 @@ These are example AgentCore commands for the new MCP tools. Replace placeholder 
 ```bash
 agentcore dev call-tool --tool ensure_project_board --input '{"input": {"root_page_id": "de5e7909de8142a79f1b07ddce89cedf", "project_name": "Project Kanban"}}'
 ```
-
+ensure_project_board {"input": {"root_page_id": "de5e7909de8142a79f1b07ddce89cedf", "project_name": "Project Kanban"}}
 ## get_project_context
 
 ```bash

@@ -1,0 +1,20 @@
+  Protocol: MCP
+  Target: us-east-1
+  Session: 84817233-2b97-418f-9b63-f904a6ba87f8
+  User: default-user
+  Auth: CUSTOM_JWT (token set)
+  Log: agentcore/.cli/logs/invoke/invoke-mcp_notion-20260519-224004.log
+  Traces: https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#/gen-ai-observability/agent-core/agent-alias/McpK
+  anban_mcp_notion-fqxbZC8Hzs/endpoint/DEFAULT/agent/mcp_notion?start=-43200000&resourceId=arn%3Aaws%3Abedrock-agentcore%3Aus-east-1%
+  3A631510543425%3Aruntime%2FMcpKanban_mcp_notion-fqxbZC8Hzs%2Fruntime-endpoint%2FDEFAULT%3ADEFAULT&serviceName=mcp_notion.DEFAULT&ta
+  bId=traces
+  Note: Traces may take 2-3 minutes to appear in CloudWatch
+
+  > ensure_project_board {"input": {"root_page_id": "de5e7909de8142a79f1b07ddce89cedf", "project_name": "Project Kanban"}}
+   
+  Error: Received error (421) from runtime. Please check your CloudWatch logs for more information.
+   
+  [5-8 of 8]
+  >  ool_name {"arg": "value"}
+
+  Enter send · Esc cancel · "list" to refresh tools · ! exec mode

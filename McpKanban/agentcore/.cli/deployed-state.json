@@ -1,0 +1,23 @@
+{
+  "targets": {
+    "default": {
+      "resources": {
+        "runtimes": {
+          "mcp_notion": {
+            "runtimeId": "McpKanban_mcp_notion-fqxbZC8Hzs",
+            "runtimeArn": "arn:aws:bedrock-agentcore:us-east-1:631510543425:runtime/McpKanban_mcp_notion-fqxbZC8Hzs",
+            "roleArn": "arn:aws:iam::631510543425:role/AgentCore-McpKanban-defau-ApplicationAgentMcpNotion-Cvs8IZcgMhDR"
+          }
+        },
+        "credentials": {
+          "mcp_notion-oauth": {
+            "credentialProviderArn": "arn:aws:bedrock-agentcore:us-east-1:631510543425:token-vault/default/oauth2credentialprovider/mcp_notion-oauth",
+            "clientSecretArn": "arn:aws:secretsmanager:us-east-1:631510543425:secret:bedrock-agentcore-identity!default/oauth2/mcp_notion-oauth-30f6a73e-7SxbxZ",
+            "callbackUrl": "https://bedrock-agentcore.us-east-1.amazonaws.com/identities/oauth2/callback/b0743004-342b-4bd9-95fc-7765727f1395"
+          }
+        },
+        "stackName": "AgentCore-McpKanban-default"
+      }
+    }
+  }
+}
