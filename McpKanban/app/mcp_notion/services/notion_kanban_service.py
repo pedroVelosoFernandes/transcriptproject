@@ -33,12 +33,11 @@ class NotionKanbanService:
         if existing_database_id:
             database = self.notion.databases.retrieve(database_id=existing_database_id)
             data_source_id = self._get_data_source_id(database)
-            board_view_id = self._try_get_board_view_id(existing_database_id, data_source_id)
             return {
                 "created": False,
                 "database_id": existing_database_id,
                 "data_source_id": data_source_id,
-                "board_view_id": board_view_id,
+                "board_view_id": None,
                 "board_view_created": False,
                 "statuses": statuses,
                 "default_status": default_status,

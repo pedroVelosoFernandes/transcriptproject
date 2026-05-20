@@ -3,66 +3,143 @@ from bedrock_agentcore.runtime import BedrockAgentCoreApp
 from model.load import load_model
 from mcp_client.client import get_streamable_http_mcp_client
 from memory.session import get_memory_session_manager
+import utils
+from boto3 import Session
+
+# ============================================================================
+# AGENTCORE APP INITIALIZATION
+# ============================================================================
 
 app = BedrockAgentCoreApp()
-log = app.logger
+model = load_model()
 
-# Define a Streamable HTTP MCP Client
-mcp_clients = [get_streamable_http_mcp_client()]
+# ============================================================================
+# LOGGING CONFIGURATION
+# ============================================================================
+logger = app.logger
 
-# Define a collection of tools used by the model
-tools = []
+# ============================================================================
+# CONFIGURATION HELPERS
+# ============================================================================
 
-# Define a simple function tool
-@tool
-def add_numbers(a: int, b: int) -> int:
-    """Return the sum of two numbers"""
-    return a+b
-tools.append(add_numbers)
+token = utils.get_cognito_token()
 
+gateway_url = utils.get_ssm_parameter("/app/kanban/agentcore/gatewayURL")
+mcp_client = get_streamable_http_mcp_client(token, gateway_url)
 
-# Add MCP client to tools if available
-for mcp_client in mcp_clients:
-    if mcp_client:
-        tools.append(mcp_client)
+# ============================================================================
+# ORCHESTRATOR AGENT CREATION
+# ============================================================================
 
-SYSTEM_PROMPT = """
-You are a helpful assistant. Use tools when appropriate.
+def create_orchestrator_agent_runtime(
+    query,
+    session_manager
+):
+    """Create the orchestrator agent for """
+
+    orchestrator_system_prompt = """
 """
 
-def agent_factory():
-    cache = {}
-    def get_or_create_agent(session_id, user_id):
-        key = f"{session_id}/{user_id}"
-        if key not in cache:
-            # Create an agent for the given session_id and user_id
-            cache[key] = Agent(
-                model=load_model(),
-                session_manager=get_memory_session_manager(session_id, user_id),
-                system_prompt=SYSTEM_PROMPT,
-                tools=tools
+    contextualized_query = f"""User Query: {query}"""
+
+    base_tools = [
+
+    ]
+    logger.info("Entering mcp_client context...")
+    with mcp_client:
+        try:
+            logger.info(f"Listing MCP tools from {gateway_url}...")
+            mcp_tools = mcp_client.list_tools_sync()
+            logger.info("Done listing MCP tools.")
+            all_tools = base_tools + mcp_tools
+            
+            logger.info(f"Added {len(mcp_tools)} MCP tools from Gateway. Total tools: {len(all_tools)}")
+            
+            orchestrator = Agent(
+                model=model,
+                system_prompt=orchestrator_system_prompt,
+                tools=all_tools,
+                session_manager=session_manager
             )
-        return cache[key]
-    return get_or_create_agent
-get_or_create_agent = agent_factory()
+            logger.info("Orchestrator agent created successfully with memory and MCP tools")
+            
+            response = orchestrator(contextualized_query)
+            logger.info("Orchestrator successfully processed query")
+            
+            return response
+            
+        except Exception as e:
+            logger.error(f"Error with MCP tools: {str(e)}")
+            logger.info("Falling back to base tools only")
+            
+            orchestrator = Agent(
+                model=model,
+                system_prompt=orchestrator_system_prompt,
+                tools=base_tools,
+                session_manager=session_manager
+            )
+            logger.info("Orchestrator agent created successfully with memory (fallback mode)")
+            
+            response = orchestrator(contextualized_query)
+            logger.info("Orchestrator successfully processed query (fallback)")
+            
+            return response
+    
 
-
+# ============================================================================
+# AGENTCORE RUNTIME ENTRYPOINT
+# ============================================================================
 @app.entrypoint
-async def invoke(payload, context):
-    log.info("Invoking Agent.....")
+def invoke(payload, context):
+    """
+    """
 
+    user_message = payload.get("inputText") or payload.get("prompt")
+    if not user_message:
+        raise Exception("Payload must include 'inputText' or 'prompt' parameter")
+    
+    # user_id = payload.get("user_id")
+    # if not user_id:
+    #     raise Exception("Payload must include 'user_id' parameter")
+    
+    # session_id = context.session_id
+    # if not session_id:
+    #     raise Exception("Context must include 'session_id'")
     session_id = getattr(context, 'session_id', 'default-session')
     user_id = getattr(context, 'user_id', 'default-user')
-    agent = get_or_create_agent(session_id, user_id)
+    
+    boto_session = Session()
+    region = boto_session.region_name
 
-    # Execute and format response
-    stream = agent.stream_async(payload.get("prompt"))
+    # Create memory session manager for this user/session
+    memory_id = utils.get_ssm_parameter("/app/kanban/agentcore/memory_id")
+    session_manager = get_memory_session_manager(session_id, user_id, region, memory_id)
 
-    async for event in stream:
-        # Handle Text parts of the response
-        if "data" in event and isinstance(event["data"], str):
-            yield event["data"]
+    try:
+        logger.info("Creating orchestrator agent")
+        result = create_orchestrator_agent_runtime(
+            query=user_message,
+            session_manager=session_manager,
+        )
+        
+        response_message = result.message if hasattr(result, 'message') else str(result)
+        
+        logger.info("Orchestrator successfully processed request")
+        
+        return {
+            "result": response_message,
+            "session_id": session_id,
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in orchestrator processing: {str(e)}")
+        raise
+
 
 
 if __name__ == "__main__":
     app.run()
+
+
+# ============================================================================
+ 
