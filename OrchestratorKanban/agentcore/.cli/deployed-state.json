@@ -4,23 +4,23 @@
       "resources": {
         "runtimes": {
           "agent_orchestrator": {
-            "runtimeId": "OrchestratorKanban_agent_orchestrator-OWy5Jx7DqB",
-            "runtimeArn": "arn:aws:bedrock-agentcore:us-east-1:631510543425:runtime/OrchestratorKanban_agent_orchestrator-OWy5Jx7DqB",
-            "roleArn": "arn:aws:iam::631510543425:role/AgentCore-OrchestratorKan-ApplicationAgentAgentOrch-JFDBbQf7aqh6"
+            "runtimeId": "OrchestratorKanban_agent_orchestrator-8mDrvWGjrc",
+            "runtimeArn": "arn:aws:bedrock-agentcore:us-east-1:631510543425:runtime/OrchestratorKanban_agent_orchestrator-8mDrvWGjrc",
+            "roleArn": "arn:aws:iam::631510543425:role/AgentCore-OrchestratorKan-ApplicationAgentAgentOrch-Vy0mAsMpR4vH"
           }
         },
         "memories": {
           "agent_orchestratorMemory": {
-            "memoryId": "OrchestratorKanban_agent_orchestratorMemory-wuGgvYFve9",
-            "memoryArn": "arn:aws:bedrock-agentcore:us-east-1:631510543425:memory/OrchestratorKanban_agent_orchestratorMemory-wuGgvYFve9"
+            "memoryId": "OrchestratorKanban_agent_orchestratorMemory-KZ60XJ6cFk",
+            "memoryArn": "arn:aws:bedrock-agentcore:us-east-1:631510543425:memory/OrchestratorKanban_agent_orchestratorMemory-KZ60XJ6cFk"
           }
         },
         "mcp": {
           "gateways": {
             "GatewayKanban": {
-              "gatewayId": "orchestratorkanban-gatewaykanban-bip5dkxfq9",
-              "gatewayArn": "arn:aws:bedrock-agentcore:us-east-1:631510543425:gateway/orchestratorkanban-gatewaykanban-bip5dkxfq9",
-              "gatewayUrl": "https://orchestratorkanban-gatewaykanban-bip5dkxfq9.gateway.bedrock-agentcore.us-east-1.amazonaws.com/mcp"
+              "gatewayId": "orchestratorkanban-gatewaykanban-0rk0eexzmu",
+              "gatewayArn": "arn:aws:bedrock-agentcore:us-east-1:631510543425:gateway/orchestratorkanban-gatewaykanban-0rk0eexzmu",
+              "gatewayUrl": "https://orchestratorkanban-gatewaykanban-0rk0eexzmu.gateway.bedrock-agentcore.us-east-1.amazonaws.com/mcp"
             }
           }
         },

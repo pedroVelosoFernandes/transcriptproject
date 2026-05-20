@@ -59,24 +59,7 @@
       "name": "GatewayKanban",
       "description": "Gateway for GatewayKanban",
       "targets": [
-        {
-          "name": "notionTool",
-          "targetType": "mcpServer",
-          "toolDefinitions": [
-            {
-              "name": "notionTool",
-              "description": "Tool for notionTool",
-              "inputSchema": {
-                "type": "object"
-              }
-            }
-          ],
-          "endpoint": "https://bedrock-agentcore.us-east-1.amazonaws.com/runtimes/arn%3Aaws%3Abedrock-agentcore%3Aus-east-1%3A631510543425%3Aruntime%2FMcpKanban_mcp_notion-fqxbZC8Hzs/invocations?qualifier=DEFAULT",
-          "outboundAuth": {
-            "type": "OAUTH",
-            "credentialName": "GatewayKanban-oauth"
-          }
-        }
+    
       ],
       "authorizerType": "CUSTOM_JWT",
       "authorizerConfiguration": {

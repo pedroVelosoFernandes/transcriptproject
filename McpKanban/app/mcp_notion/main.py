@@ -22,7 +22,7 @@ from services.notion_kanban_service import NotionKanbanService
 
 load_dotenv()
 
-mcp = FastMCP("Notion Kanban MCP")
+mcp = FastMCP("Notion Kanban MCP",host="0.0.0.0", json_response=True, stateless_http=True)
 
 
 def _debug_enabled() -> bool:
