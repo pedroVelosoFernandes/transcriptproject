@@ -73,6 +73,8 @@ class NotionKanbanService:
                     },
                     "Description": {"rich_text": {}},
                     "External ID": {"rich_text": {}},
+                    "Assignee": {"people": {}},
+                    "Reviewer": {"people": {}},
                 },
             },
         )
@@ -195,6 +197,8 @@ class NotionKanbanService:
         description: str = "",
         external_id: Optional[str] = None,
         details_markdown: Optional[str] = None,
+        assignee_ids: Optional[List[str]] = None,
+        reviewer_ids: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         if external_id:
             existing = self._find_issue_by_external_id(data_source_id, external_id)
@@ -213,6 +217,12 @@ class NotionKanbanService:
 
         if external_id:
             properties["External ID"] = {"rich_text": rich_text(external_id)}
+
+        if assignee_ids:
+            properties["Assignee"] = {"people": [{"id": uid} for uid in assignee_ids]}
+
+        if reviewer_ids:
+            properties["Reviewer"] = {"people": [{"id": uid} for uid in reviewer_ids]}
 
         body: Dict[str, Any] = {
             "parent": {"type": "data_source_id", "data_source_id": data_source_id},
@@ -238,6 +248,8 @@ class NotionKanbanService:
         priority: Optional[str] = None,
         description: Optional[str] = None,
         external_id: Optional[str] = None,
+        assignee_ids: Optional[List[str]] = None,
+        reviewer_ids: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         properties: Dict[str, Any] = {}
 
@@ -255,6 +267,12 @@ class NotionKanbanService:
 
         if external_id is not None:
             properties["External ID"] = {"rich_text": rich_text(external_id)}
+
+        if assignee_ids is not None:
+            properties["Assignee"] = {"people": [{"id": uid} for uid in assignee_ids]}
+
+        if reviewer_ids is not None:
+            properties["Reviewer"] = {"people": [{"id": uid} for uid in reviewer_ids]}
 
         if not properties:
             raise ValueError("No properties provided to update.")
@@ -292,6 +310,21 @@ class NotionKanbanService:
             "options": [opt.get("name") for opt in options],
         }
 
+    def list_workspace_members(self) -> Dict[str, Any]:
+        results = paginate(self.notion.users.list, page_size=100)
+        members = []
+        for user in results:
+            if user.get("type") == "bot":
+                continue
+            members.append({
+                "id": user.get("id"),
+                "name": user.get("name"),
+                "email": user.get("person", {}).get("email"),
+                "type": user.get("type"),
+                "avatar_url": user.get("avatar_url"),
+            })
+        return {"count": len(members), "members": members}
+
     def _compact_issue(self, page: Dict[str, Any]) -> Dict[str, Any]:
         props = extract_page_properties(page)
         return {
@@ -301,6 +334,8 @@ class NotionKanbanService:
             "priority": props.get("Priority"),
             "description": props.get("Description"),
             "external_id": props.get("External ID"),
+            "assignee": props.get("Assignee"),
+            "reviewer": props.get("Reviewer"),
             "url": page.get("url"),
             "created_time": page.get("created_time"),
             "last_edited_time": page.get("last_edited_time"),

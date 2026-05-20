@@ -149,6 +149,8 @@ def create_issue(input: IssueCreateInput) -> Dict[str, Any]:
     - description: Short description text.
     - external_id: Optional idempotency key stored in External ID.
     - details_markdown: Optional markdown converted to blocks inside the issue.
+    - assignee_ids: Optional list of Notion user IDs to assign.
+    - reviewer_ids: Optional list of Notion user IDs as reviewers.
     Output: ok/data with created flag and issue.
     """
     try:
@@ -161,6 +163,8 @@ def create_issue(input: IssueCreateInput) -> Dict[str, Any]:
             description=input.description,
             external_id=input.external_id,
             details_markdown=input.details_markdown,
+            assignee_ids=input.assignee_ids,
+            reviewer_ids=input.reviewer_ids,
         )
         return _ok(data)
     except Exception as exc:  # noqa: BLE001
@@ -178,6 +182,8 @@ def update_issue(input: IssueUpdateInput) -> Dict[str, Any]:
     - priority: New priority value.
     - description: New description value.
     - external_id: New external id stored in External ID.
+    - assignee_ids: List of Notion user IDs to assign.
+    - reviewer_ids: List of Notion user IDs as reviewers.
     Output: ok/data with updated issue fields.
     """
     try:
@@ -189,6 +195,8 @@ def update_issue(input: IssueUpdateInput) -> Dict[str, Any]:
             priority=input.priority.value if input.priority else None,
             description=input.description,
             external_id=input.external_id,
+            assignee_ids=input.assignee_ids,
+            reviewer_ids=input.reviewer_ids,
         )
         return _ok(data)
     except Exception as exc:  # noqa: BLE001
@@ -246,6 +254,21 @@ def get_status_options(data_source_id: str) -> Dict[str, Any]:
     try:
         service = _get_service()
         data = service.get_status_options(data_source_id=data_source_id)
+        return _ok(data)
+    except Exception as exc:  # noqa: BLE001
+        return _fail(exc)
+
+
+@mcp.tool()
+def list_workspace_members() -> Dict[str, Any]:
+    """List all people (non-bot) members in the Notion workspace.
+
+    Use this to resolve user names to Notion user IDs for assignee/reviewer fields.
+    Output: ok/data with count and members list (id, name, email, avatar_url).
+    """
+    try:
+        service = _get_service()
+        data = service.list_workspace_members()
         return _ok(data)
     except Exception as exc:  # noqa: BLE001
         return _fail(exc)

@@ -28,6 +28,8 @@ class CreateAction(BaseModel):
     description: str
     details_markdown: Optional[str] = None
     external_id: str
+    assignee_ids: Optional[list[str]] = None
+    reviewer_ids: Optional[list[str]] = None
 
 
 class UpdateAction(BaseModel):
@@ -37,6 +39,8 @@ class UpdateAction(BaseModel):
     status: Optional[IssueStatus] = None
     priority: Optional[Priority] = None
     description: Optional[str] = None
+    assignee_ids: Optional[list[str]] = None
+    reviewer_ids: Optional[list[str]] = None
 
 
 class MoveStatusAction(BaseModel):

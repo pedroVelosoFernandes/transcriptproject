@@ -1,0 +1,46 @@
+Reunião de Sprint Planning - 20 de maio de 2026
+  Participantes: Pedro, Marina, Lucas, Carla
+
+  Pedro: Bom, vamos começar. Marina, como ficou aquela task de migração do banco de dados?
+
+  Marina: Terminei ontem. Já tá em produção, rodando sem problemas. Pode fechar essa.
+
+  Pedro: Ótimo. Lucas, e o módulo de relatórios?
+
+  Lucas: Comecei a trabalhar nisso segunda-feira. Tô fazendo o backend das queries, deve levar mais uns 3
+   dias. Tô precisando que a Carla revise o PR quando eu terminar.
+
+  Carla: Pode deixar, fico de reviewer nisso.
+
+  Pedro: Beleza. Agora, temos uma demanda nova que é urgente: o cliente pediu integração com o Slack para
+   notificações. Precisa ficar pronta até sexta. Marina, consegue pegar isso?
+
+  Marina: Consigo sim. Vou precisar configurar o webhook e criar os templates de mensagem. É crítico
+  mesmo?
+
+  Pedro: Sim, é prioridade alta. O cliente tá pressionando.
+
+  Carla: Pessoal, aproveitando — eu identifiquei um bug no fluxo de login. Quando o token expira durante
+  uma sessão ativa, o usuário recebe um erro 500 ao invés de ser redirecionado pro login. Não é urgente
+  mas deveria entrar no backlog.
+
+  Pedro: Anota isso. Prioridade média, acho. Lucas, quando terminar o módulo de relatórios, consegue dar
+  uma olhada nisso?
+
+  Lucas: Posso sim, coloca como próximo item pra mim.
+
+  Pedro: Última coisa — precisamos documentar a API do módulo de pagamentos. É nice to have por agora,
+  mas eventualmente alguém tem que fazer. Sem pressa.
+
+  Marina: Eu posso pegar isso quando terminar o Slack.
+
+  Pedro: Fechado. Resumindo: Marina fecha o Slack até sexta, Lucas termina relatórios e depois pega o bug
+   do login, e a documentação fica pro futuro. Valeu pessoal.
+
+  Esse transcript testa:
+  - Move to Done: migração do banco (Marina terminou)
+  - Move to In Progress: módulo de relatórios (Lucas começou)
+  - Create High: integração Slack (urgente, assignee Marina)
+  - Create Medium: bug do token/login (assignee Lucas, backlog)
+  - Create Low: documentação API pagamentos (nice to have, assignee Marina)
+  - Reviewer: Carla como reviewer do módulo de relatórios

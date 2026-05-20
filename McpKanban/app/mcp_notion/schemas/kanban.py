@@ -45,6 +45,8 @@ class IssueCreateInput(BaseModel):
     description: str = ""
     external_id: Optional[str] = None
     details_markdown: Optional[str] = None
+    assignee_ids: Optional[list[str]] = Field(None, description="List of Notion user IDs to assign")
+    reviewer_ids: Optional[list[str]] = Field(None, description="List of Notion user IDs as reviewers")
 
 
 class IssueUpdateInput(BaseModel):
@@ -54,6 +56,8 @@ class IssueUpdateInput(BaseModel):
     priority: Optional[IssuePriority] = None
     description: Optional[str] = None
     external_id: Optional[str] = None
+    assignee_ids: Optional[list[str]] = Field(None, description="List of Notion user IDs to assign")
+    reviewer_ids: Optional[list[str]] = Field(None, description="List of Notion user IDs as reviewers")
 
 
 class IssueMoveInput(BaseModel):
