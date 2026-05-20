@@ -87,4 +87,3 @@ def put_ssm_parameter(
 
     ssm.put_parameter(**put_params)
 
-print(get_cognito_token())
