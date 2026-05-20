@@ -36,11 +36,3 @@ Reunião de Sprint Planning - 20 de maio de 2026
 
   Pedro: Fechado. Resumindo: Marina fecha o Slack até sexta, Lucas termina relatórios e depois pega o bug
    do login, e a documentação fica pro futuro. Valeu pessoal.
-
-  Esse transcript testa:
-  - Move to Done: migração do banco (Marina terminou)
-  - Move to In Progress: módulo de relatórios (Lucas começou)
-  - Create High: integração Slack (urgente, assignee Marina)
-  - Create Medium: bug do token/login (assignee Lucas, backlog)
-  - Create Low: documentação API pagamentos (nice to have, assignee Marina)
-  - Reviewer: Carla como reviewer do módulo de relatórios

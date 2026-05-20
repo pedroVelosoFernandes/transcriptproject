@@ -57,17 +57,20 @@ class NotionKanbanService:
                     "Status": {
                         "status": {
                             "options": [
-                                {"name": status_name}
-                                for status_name in statuses
+                                {"name": "Backlog", "color": "default"},
+                                {"name": "Ready", "color": "blue"},
+                                {"name": "In Progress", "color": "yellow"},
+                                {"name": "In Review", "color": "purple"},
+                                {"name": "Done", "color": "green"},
                             ]
                         }
                     },
                     "Priority": {
                         "select": {
                             "options": [
-                                {"name": "Low"},
-                                {"name": "Medium"},
-                                {"name": "High"},
+                                {"name": "Low", "color": "gray"},
+                                {"name": "Medium", "color": "yellow"},
+                                {"name": "High", "color": "red"},
                             ]
                         }
                     },
