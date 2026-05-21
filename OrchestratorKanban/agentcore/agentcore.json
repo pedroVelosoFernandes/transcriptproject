@@ -10,6 +10,9 @@
   "runtimes": [
     {
       "name": "agent_orchestrator",
+      "requestHeaderAllowlist": [
+        "X-Amzn-Bedrock-AgentCore-Runtime-Custom-notion-token"
+      ],
       "build": "CodeZip",
       "entrypoint": "main.py",
       "codeLocation": "app/agent_orchestrator/",

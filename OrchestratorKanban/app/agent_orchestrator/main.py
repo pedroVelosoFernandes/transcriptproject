@@ -15,15 +15,16 @@ app = BedrockAgentCoreApp()
 model = load_model()
 logger = app.logger
 
-token = utils.get_cognito_token()
 gateway_url = utils.get_ssm_parameter("/app/kanban/agentcore/gatewayURL")
-mcp_client = get_streamable_http_mcp_client(token, gateway_url)
 
 planner_tool = create_planner_tool()
 
 
-def create_orchestrator_agent_runtime(query, session_manager):
+def create_orchestrator_agent_runtime(query, session_manager, notion_token: str):
     base_tools = [planner_tool]
+
+    cognito_token = utils.get_cognito_token()
+    mcp_client = get_streamable_http_mcp_client(cognito_token, gateway_url, notion_token)
 
     logger.info("Entering mcp_client context...")
     with mcp_client:
@@ -51,8 +52,15 @@ def create_orchestrator_agent_runtime(query, session_manager):
 
 @app.entrypoint
 def invoke(payload, context):
-    action = payload.get("action")
+    action = payload.get("action", "")
     user_message = payload.get("inputText") or payload.get("prompt")
+
+    notion_token = payload.get("notion_token")
+
+    if not notion_token:
+        raise Exception("Payload must include 'notion_token'")
+
+    logger.info(f"notion_token: {notion_token}")
 
     if not action and not user_message:
         raise Exception("Payload must include 'inputText'/'prompt' or 'action'")
@@ -65,8 +73,8 @@ def invoke(payload, context):
     if not project_name:
         project_name = utils.get_ssm_parameter("/app/kanban/agentcore/default_project_name")
 
-    session_id = getattr(context, "session_id", "default-session")
-    user_id = getattr(context, "user_id", "default-user")
+    session_id = payload.get("session_id")
+    user_id = payload.get("user_id", "default-user")
 
     boto_session = Session()
     region = boto_session.region_name
@@ -93,6 +101,7 @@ Transcript:
     result = create_orchestrator_agent_runtime(
         query=contextualized_query,
         session_manager=session_manager,
+        notion_token=notion_token
     )
 
     response_message = result.message if hasattr(result, "message") else str(result)

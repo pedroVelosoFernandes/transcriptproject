@@ -3,10 +3,10 @@ from __future__ import annotations
 import os
 import traceback
 from typing import Any, Dict
-
+import logging
 from dotenv import load_dotenv
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP, Context
 
 
 from schemas.kanban import (
@@ -24,6 +24,13 @@ load_dotenv()
 
 mcp = FastMCP("Notion Kanban MCP",host="0.0.0.0", json_response=True, stateless_http=True)
 
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
+logger = logging.getLogger(__name__)
+LOGGING_LEVEL_MAP = logging.getLevelNamesMapping()
 
 def _debug_enabled() -> bool:
     return os.getenv("DEBUG", "false").lower() == "true"
@@ -43,16 +50,27 @@ def _fail(exc: Exception) -> Dict[str, Any]:
     return {"ok": False, "error": error}
 
 
-def _get_service() -> NotionKanbanService:
-    notion_token = os.getenv("NOTION_TOKEN")
+def _get_service(ctx: Context) -> NotionKanbanService:
+    notion_token = None
+    headers_recebidos = {}
+
+    if hasattr(ctx, "request_context") and hasattr(ctx.request_context, "headers"):
+        headers_recebidos = dict(ctx.request_context.headers)
+        notion_token = headers_recebidos.get("X-Amzn-Bedrock-AgentCore-Runtime-Custom-notion-token")
+
+    logger.info(f"Headers recebidos: {list(headers_recebidos.keys())}")
+    logger.info(f"Valor do X-Amzn-Bedrock-AgentCore-Runtime-Custom-notion-token: {notion_token}")
+
     if not notion_token:
-        raise ValueError("NOTION_TOKEN environment variable is not set")
+        chaves = list(headers_recebidos.keys())
+        raise ValueError(f"Token do Notion ausente. A AWS deixou passar apenas os seguintes headers: {chaves}")
+
     notion_version = os.getenv("NOTION_VERSION", "2026-03-11")
     return NotionKanbanService(notion_token=notion_token, notion_version=notion_version)
 
 
 @mcp.tool()
-def ensure_project_board(input: BoardRef) -> Dict[str, Any]:
+def ensure_project_board(input: BoardRef, ctx: Context) -> Dict[str, Any]:
     """Ensure a project Kanban exists under the given root page.
 
     Input:
@@ -61,7 +79,7 @@ def ensure_project_board(input: BoardRef) -> Dict[str, Any]:
     Output: ok/data with database_id, data_source_id, board_view_id, created.
     """
     try:
-        service = _get_service()
+        service = _get_service(ctx)
         data = service.ensure_project_board(
             root_page_id=input.root_page_id,
             project_name=input.project_name,
@@ -74,7 +92,7 @@ def ensure_project_board(input: BoardRef) -> Dict[str, Any]:
 
 
 @mcp.tool()
-def get_project_context(input: BoardRef) -> Dict[str, Any]:
+def get_project_context(input: BoardRef, ctx: Context) -> Dict[str, Any]:
     """Return a compact kanban summary grouped by status for a project.
 
     Input:
@@ -83,7 +101,7 @@ def get_project_context(input: BoardRef) -> Dict[str, Any]:
     Output: ok/data with summary totals and kanban grouped by status.
     """
     try:
-        service = _get_service()
+        service = _get_service(ctx)
         data = service.get_project_context(
             root_page_id=input.root_page_id,
             project_name=input.project_name,
@@ -94,7 +112,7 @@ def get_project_context(input: BoardRef) -> Dict[str, Any]:
 
 
 @mcp.tool()
-def list_issues(input: IssueListInput) -> Dict[str, Any]:
+def list_issues(input: IssueListInput, ctx: Context) -> Dict[str, Any]:
     """List issues from a data source with optional status filtering.
 
     Input:
@@ -105,7 +123,7 @@ def list_issues(input: IssueListInput) -> Dict[str, Any]:
     Output: ok/data with issues list and count.
     """
     try:
-        service = _get_service()
+        service = _get_service(ctx)
         data = service.list_issues(
             data_source_id=input.data_source_id,
             status=input.status.value if input.status else None,
@@ -118,7 +136,7 @@ def list_issues(input: IssueListInput) -> Dict[str, Any]:
 
 
 @mcp.tool()
-def get_issue(input: IssueGetInput) -> Dict[str, Any]:
+def get_issue(input: IssueGetInput, ctx: Context) -> Dict[str, Any]:
     """Fetch a single issue by page id, optionally including blocks.
 
     Input:
@@ -127,7 +145,7 @@ def get_issue(input: IssueGetInput) -> Dict[str, Any]:
     Output: ok/data with issue fields and optional blocks.
     """
     try:
-        service = _get_service()
+        service = _get_service(ctx)
         data = service.get_issue(
             page_id=input.page_id,
             include_blocks=input.include_blocks,
@@ -138,7 +156,7 @@ def get_issue(input: IssueGetInput) -> Dict[str, Any]:
 
 
 @mcp.tool()
-def create_issue(input: IssueCreateInput) -> Dict[str, Any]:
+def create_issue(input: IssueCreateInput, ctx: Context) -> Dict[str, Any]:
     """Create an issue in a data source, idempotent by External ID.
 
     Input:
@@ -154,7 +172,7 @@ def create_issue(input: IssueCreateInput) -> Dict[str, Any]:
     Output: ok/data with created flag and issue.
     """
     try:
-        service = _get_service()
+        service = _get_service(ctx)
         data = service.create_issue(
             data_source_id=input.data_source_id,
             title=input.title,
@@ -172,7 +190,7 @@ def create_issue(input: IssueCreateInput) -> Dict[str, Any]:
 
 
 @mcp.tool()
-def update_issue(input: IssueUpdateInput) -> Dict[str, Any]:
+def update_issue(input: IssueUpdateInput, ctx: Context) -> Dict[str, Any]:
     """Update an issue properties by page id.
 
     Input:
@@ -187,7 +205,7 @@ def update_issue(input: IssueUpdateInput) -> Dict[str, Any]:
     Output: ok/data with updated issue fields.
     """
     try:
-        service = _get_service()
+        service = _get_service(ctx)
         data = service.update_issue(
             page_id=input.page_id,
             title=input.title,
@@ -204,7 +222,7 @@ def update_issue(input: IssueUpdateInput) -> Dict[str, Any]:
 
 
 @mcp.tool()
-def move_issue_status(input: IssueMoveInput) -> Dict[str, Any]:
+def move_issue_status(input: IssueMoveInput, ctx: Context) -> Dict[str, Any]:
     """Move an issue between statuses by updating its Status property.
 
     Input:
@@ -213,7 +231,7 @@ def move_issue_status(input: IssueMoveInput) -> Dict[str, Any]:
     Output: ok/data with updated issue fields.
     """
     try:
-        service = _get_service()
+        service = _get_service(ctx)
         data = service.move_issue(
             page_id=input.page_id,
             status=input.status.value,
@@ -224,7 +242,7 @@ def move_issue_status(input: IssueMoveInput) -> Dict[str, Any]:
 
 
 @mcp.tool()
-def append_issue_content(input: IssueContentAppendInput) -> Dict[str, Any]:
+def append_issue_content(input: IssueContentAppendInput, ctx: Context) -> Dict[str, Any]:
     """Append markdown content to an issue page as Notion blocks.
 
     Input:
@@ -233,7 +251,7 @@ def append_issue_content(input: IssueContentAppendInput) -> Dict[str, Any]:
     Output: ok/data with appended count.
     """
     try:
-        service = _get_service()
+        service = _get_service(ctx)
         data = service.append_issue_content(
             page_id=input.page_id,
             markdown=input.markdown,
@@ -244,7 +262,7 @@ def append_issue_content(input: IssueContentAppendInput) -> Dict[str, Any]:
 
 
 @mcp.tool()
-def get_status_options(data_source_id: str) -> Dict[str, Any]:
+def get_status_options(data_source_id: str, ctx: Context) -> Dict[str, Any]:
     """Return available status options for a data source.
 
     Input:
@@ -252,7 +270,7 @@ def get_status_options(data_source_id: str) -> Dict[str, Any]:
     Output: ok/data with status options list.
     """
     try:
-        service = _get_service()
+        service = _get_service(ctx)
         data = service.get_status_options(data_source_id=data_source_id)
         return _ok(data)
     except Exception as exc:  # noqa: BLE001
@@ -260,14 +278,14 @@ def get_status_options(data_source_id: str) -> Dict[str, Any]:
 
 
 @mcp.tool()
-def list_workspace_members() -> Dict[str, Any]:
+def list_workspace_members(ctx: Context) -> Dict[str, Any]:
     """List all people (non-bot) members in the Notion workspace.
 
     Use this to resolve user names to Notion user IDs for assignee/reviewer fields.
     Output: ok/data with count and members list (id, name, email, avatar_url).
     """
     try:
-        service = _get_service()
+        service = _get_service(ctx)
         data = service.list_workspace_members()
         return _ok(data)
     except Exception as exc:  # noqa: BLE001
