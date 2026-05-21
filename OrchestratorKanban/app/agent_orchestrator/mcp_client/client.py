@@ -7,12 +7,12 @@ logger = logging.getLogger(__name__)
 
 # ExaAI provides information about code through web searches, crawling and code context searches through their platform. Requires no authentication
 
-def get_streamable_http_mcp_client(token: str, gateway_url: str, notion_token: str) -> MCPClient:
+def get_streamable_http_mcp_client(token: str, gateway_url: str) -> MCPClient:
     """Returns an MCP Client compatible with Strands"""
     # to use an MCP server that supports bearer authentication, add headers={"Authorization": f"Bearer {access_token}"}
     return MCPClient(lambda: streamablehttp_client(
         gateway_url,
-        headers={"Authorization": f"Bearer {token}", "X-Amzn-Bedrock-AgentCore-Runtime-Custom-notion-token": notion_token}
+        headers={"Authorization": f"Bearer {token}"}
     ))
 
 if __name__ == "__main__":

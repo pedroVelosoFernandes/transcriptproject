@@ -20,11 +20,11 @@ gateway_url = utils.get_ssm_parameter("/app/kanban/agentcore/gatewayURL")
 planner_tool = create_planner_tool()
 
 
-def create_orchestrator_agent_runtime(query, session_manager, notion_token: str):
+def create_orchestrator_agent_runtime(query, session_manager):
     base_tools = [planner_tool]
 
     cognito_token = utils.get_cognito_token()
-    mcp_client = get_streamable_http_mcp_client(cognito_token, gateway_url, notion_token)
+    mcp_client = get_streamable_http_mcp_client(cognito_token, gateway_url)
 
     logger.info("Entering mcp_client context...")
     with mcp_client:
@@ -92,6 +92,7 @@ def invoke(payload, context):
 
 Root Page ID: {root_page_id}
 Project Name: {project_name}
+notion_token: {notion_token}
 
 Transcript:
 {user_message}"""
@@ -101,7 +102,6 @@ Transcript:
     result = create_orchestrator_agent_runtime(
         query=contextualized_query,
         session_manager=session_manager,
-        notion_token=notion_token
     )
 
     response_message = result.message if hasattr(result, "message") else str(result)

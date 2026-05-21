@@ -50,36 +50,24 @@ def _fail(exc: Exception) -> Dict[str, Any]:
     return {"ok": False, "error": error}
 
 
-def _get_service(ctx: Context) -> NotionKanbanService:
-    notion_token = None
-    headers_recebidos = {}
-
-    if hasattr(ctx, "request_context") and hasattr(ctx.request_context, "headers"):
-        headers_recebidos = dict(ctx.request_context.headers)
-        notion_token = headers_recebidos.get("X-Amzn-Bedrock-AgentCore-Runtime-Custom-notion-token")
-
-    logger.info(f"Headers recebidos: {list(headers_recebidos.keys())}")
-    logger.info(f"Valor do X-Amzn-Bedrock-AgentCore-Runtime-Custom-notion-token: {notion_token}")
-
-    if not notion_token:
-        chaves = list(headers_recebidos.keys())
-        raise ValueError(f"Token do Notion ausente. A AWS deixou passar apenas os seguintes headers: {chaves}")
-
+def _get_service(notion_token: str) -> NotionKanbanService:
     notion_version = os.getenv("NOTION_VERSION", "2026-03-11")
     return NotionKanbanService(notion_token=notion_token, notion_version=notion_version)
 
 
+
 @mcp.tool()
-def ensure_project_board(input: BoardRef, ctx: Context) -> Dict[str, Any]:
+def ensure_project_board(input: BoardRef, notion_token: str) -> Dict[str, Any]:
     """Ensure a project Kanban exists under the given root page.
 
     Input:
     - root_page_id: Notion page id that will contain the project database.
     - project_name: Database title to find or create under the root page.
+    - notion_token: Token to guarantee access to Notion.
     Output: ok/data with database_id, data_source_id, board_view_id, created.
     """
     try:
-        service = _get_service(ctx)
+        service = _get_service(notion_token)
         data = service.ensure_project_board(
             root_page_id=input.root_page_id,
             project_name=input.project_name,
@@ -92,16 +80,17 @@ def ensure_project_board(input: BoardRef, ctx: Context) -> Dict[str, Any]:
 
 
 @mcp.tool()
-def get_project_context(input: BoardRef, ctx: Context) -> Dict[str, Any]:
+def get_project_context(input: BoardRef, notion_token: str) -> Dict[str, Any]:
     """Return a compact kanban summary grouped by status for a project.
 
     Input:
     - root_page_id: Notion page id that contains the project database.
     - project_name: Database title used to locate the kanban board.
+    - notion_token: Token to guarantee access to Notion.
     Output: ok/data with summary totals and kanban grouped by status.
     """
     try:
-        service = _get_service(ctx)
+        service = _get_service(notion_token)
         data = service.get_project_context(
             root_page_id=input.root_page_id,
             project_name=input.project_name,
@@ -112,7 +101,7 @@ def get_project_context(input: BoardRef, ctx: Context) -> Dict[str, Any]:
 
 
 @mcp.tool()
-def list_issues(input: IssueListInput, ctx: Context) -> Dict[str, Any]:
+def list_issues(input: IssueListInput, notion_token: str) -> Dict[str, Any]:
     """List issues from a data source with optional status filtering.
 
     Input:
@@ -120,10 +109,11 @@ def list_issues(input: IssueListInput, ctx: Context) -> Dict[str, Any]:
     - status: Optional status filter (e.g., Backlog).
     - include_blocks: When true, includes issue blocks in the response.
     - limit: Max number of issues to return (default 100).
+    - notion_token: Token to guarantee access to Notion.
     Output: ok/data with issues list and count.
     """
     try:
-        service = _get_service(ctx)
+        service = _get_service(notion_token)
         data = service.list_issues(
             data_source_id=input.data_source_id,
             status=input.status.value if input.status else None,
@@ -136,16 +126,17 @@ def list_issues(input: IssueListInput, ctx: Context) -> Dict[str, Any]:
 
 
 @mcp.tool()
-def get_issue(input: IssueGetInput, ctx: Context) -> Dict[str, Any]:
+def get_issue(input: IssueGetInput, notion_token: str) -> Dict[str, Any]:
     """Fetch a single issue by page id, optionally including blocks.
 
     Input:
     - page_id: Notion page id of the issue.
     - include_blocks: When true, includes issue blocks in the response.
+    - notion_token: Token to guarantee access to Notion.
     Output: ok/data with issue fields and optional blocks.
     """
     try:
-        service = _get_service(ctx)
+        service = _get_service(notion_token)
         data = service.get_issue(
             page_id=input.page_id,
             include_blocks=input.include_blocks,
@@ -156,7 +147,7 @@ def get_issue(input: IssueGetInput, ctx: Context) -> Dict[str, Any]:
 
 
 @mcp.tool()
-def create_issue(input: IssueCreateInput, ctx: Context) -> Dict[str, Any]:
+def create_issue(input: IssueCreateInput, notion_token: str) -> Dict[str, Any]:
     """Create an issue in a data source, idempotent by External ID.
 
     Input:
@@ -169,10 +160,11 @@ def create_issue(input: IssueCreateInput, ctx: Context) -> Dict[str, Any]:
     - details_markdown: Optional markdown converted to blocks inside the issue.
     - assignee_ids: Optional list of Notion user IDs to assign.
     - reviewer_ids: Optional list of Notion user IDs as reviewers.
+    - notion_token: Token to guarantee access to Notion.
     Output: ok/data with created flag and issue.
     """
     try:
-        service = _get_service(ctx)
+        service = _get_service(notion_token)
         data = service.create_issue(
             data_source_id=input.data_source_id,
             title=input.title,
@@ -190,7 +182,7 @@ def create_issue(input: IssueCreateInput, ctx: Context) -> Dict[str, Any]:
 
 
 @mcp.tool()
-def update_issue(input: IssueUpdateInput, ctx: Context) -> Dict[str, Any]:
+def update_issue(input: IssueUpdateInput, notion_token: str) -> Dict[str, Any]:
     """Update an issue properties by page id.
 
     Input:
@@ -202,10 +194,11 @@ def update_issue(input: IssueUpdateInput, ctx: Context) -> Dict[str, Any]:
     - external_id: New external id stored in External ID.
     - assignee_ids: List of Notion user IDs to assign.
     - reviewer_ids: List of Notion user IDs as reviewers.
+    - notion_token: Token to guarantee access to Notion.
     Output: ok/data with updated issue fields.
     """
     try:
-        service = _get_service(ctx)
+        service = _get_service(notion_token)
         data = service.update_issue(
             page_id=input.page_id,
             title=input.title,
@@ -222,16 +215,17 @@ def update_issue(input: IssueUpdateInput, ctx: Context) -> Dict[str, Any]:
 
 
 @mcp.tool()
-def move_issue_status(input: IssueMoveInput, ctx: Context) -> Dict[str, Any]:
+def move_issue_status(input: IssueMoveInput, notion_token: str) -> Dict[str, Any]:
     """Move an issue between statuses by updating its Status property.
 
     Input:
     - page_id: Notion page id of the issue to move.
     - status: Target status value.
+    - notion_token: Token to guarantee access to Notion.
     Output: ok/data with updated issue fields.
     """
     try:
-        service = _get_service(ctx)
+        service = _get_service(notion_token)
         data = service.move_issue(
             page_id=input.page_id,
             status=input.status.value,
@@ -242,16 +236,17 @@ def move_issue_status(input: IssueMoveInput, ctx: Context) -> Dict[str, Any]:
 
 
 @mcp.tool()
-def append_issue_content(input: IssueContentAppendInput, ctx: Context) -> Dict[str, Any]:
+def append_issue_content(input: IssueContentAppendInput, notion_token: str) -> Dict[str, Any]:
     """Append markdown content to an issue page as Notion blocks.
 
     Input:
     - page_id: Notion page id of the issue to append content to.
     - markdown: Markdown text to append as Notion blocks.
+    - notion_token: Token to guarantee access to Notion.
     Output: ok/data with appended count.
     """
     try:
-        service = _get_service(ctx)
+        service = _get_service(notion_token)
         data = service.append_issue_content(
             page_id=input.page_id,
             markdown=input.markdown,
@@ -262,15 +257,16 @@ def append_issue_content(input: IssueContentAppendInput, ctx: Context) -> Dict[s
 
 
 @mcp.tool()
-def get_status_options(data_source_id: str, ctx: Context) -> Dict[str, Any]:
+def get_status_options(data_source_id: str, notion_token: str) -> Dict[str, Any]:
     """Return available status options for a data source.
 
     Input:
     - data_source_id: Notion data source id to read status options from.
+    - notion_token: Token to guarantee access to Notion.
     Output: ok/data with status options list.
     """
     try:
-        service = _get_service(ctx)
+        service = _get_service(notion_token)
         data = service.get_status_options(data_source_id=data_source_id)
         return _ok(data)
     except Exception as exc:  # noqa: BLE001
@@ -278,14 +274,16 @@ def get_status_options(data_source_id: str, ctx: Context) -> Dict[str, Any]:
 
 
 @mcp.tool()
-def list_workspace_members(ctx: Context) -> Dict[str, Any]:
+def list_workspace_members(notion_token: str) -> Dict[str, Any]:
     """List all people (non-bot) members in the Notion workspace.
 
     Use this to resolve user names to Notion user IDs for assignee/reviewer fields.
+    Input:
+    - notion_token: Token to guarantee access to Notion.
     Output: ok/data with count and members list (id, name, email, avatar_url).
     """
     try:
-        service = _get_service(ctx)
+        service = _get_service(notion_token)
         data = service.list_workspace_members()
         return _ok(data)
     except Exception as exc:  # noqa: BLE001
