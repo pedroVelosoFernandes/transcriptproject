@@ -1,0 +1,81 @@
+{
+  "$schema": "https://schema.agentcore.aws.dev/v1/agentcore.json",
+  "name": "OrchestratorKanban",
+  "version": 1,
+  "managedBy": "CDK",
+  "tags": {
+    "agentcore:created-by": "agentcore-cli",
+    "agentcore:project-name": "OrchestratorKanban"
+  },
+  "runtimes": [
+    {
+      "name": "agent_orchestrator",
+      "requestHeaderAllowlist": [
+        "X-Amzn-Bedrock-AgentCore-Runtime-Custom-notion-token"
+      ],
+      "build": "CodeZip",
+      "entrypoint": "main.py",
+      "codeLocation": "app/agent_orchestrator/",
+      "runtimeVersion": "PYTHON_3_14",
+      "networkMode": "PUBLIC",
+      "protocol": "HTTP",
+      "authorizerType": "CUSTOM_JWT",
+      "authorizerConfiguration": {
+        "customJwtAuthorizer": {
+          "discoveryUrl": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_YcWqwsxwB/.well-known/openid-configuration",
+          "allowedClients": [
+            "42lqalo5vsb6ofoboq0dgvfb4i"
+          ]
+        }
+      }
+    }
+  ],
+  "memories": [
+    {
+      "name": "agent_orchestratorMemory",
+      "eventExpiryDuration": 30,
+      "strategies": []
+    }
+  ],
+  "credentials": [
+    {
+      "authorizerType": "OAuthCredentialProvider",
+      "name": "agent_orchestrator-oauth",
+      "discoveryUrl": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_YcWqwsxwB/.well-known/openid-configuration",
+      "vendor": "CustomOauth2",
+      "managed": true,
+      "usage": "inbound"
+    },
+    {
+      "authorizerType": "OAuthCredentialProvider",
+      "name": "GatewayKanban-oauth",
+      "discoveryUrl": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_YcWqwsxwB/.well-known/openid-configuration",
+      "vendor": "CustomOauth2",
+      "managed": true,
+      "usage": "inbound"
+    }
+  ],
+  "evaluators": [],
+  "onlineEvalConfigs": [],
+  "agentCoreGateways": [
+    {
+      "name": "GatewayKanban",
+      "description": "Gateway for GatewayKanban",
+      "targets": [
+    
+      ],
+      "authorizerType": "CUSTOM_JWT",
+      "authorizerConfiguration": {
+        "customJwtAuthorizer": {
+          "discoveryUrl": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_YcWqwsxwB/.well-known/openid-configuration",
+          "allowedClients": [
+            "42lqalo5vsb6ofoboq0dgvfb4i"
+          ]
+        }
+      },
+      "enableSemanticSearch": true,
+      "exceptionLevel": "NONE"
+    }
+  ],
+  "policyEngines": []
+}
